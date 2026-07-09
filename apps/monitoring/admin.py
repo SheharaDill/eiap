@@ -14,6 +14,7 @@ the Django Admin interface.
 
 # Import Django's admin module.
 # This provides tools to customize the Django Admin Panel.
+from .models import Metric
 from django.contrib import admin
 
 # Import the models we want to manage in the Admin Panel.
@@ -157,4 +158,50 @@ class MonitoringJobAdmin(admin.ModelAdmin):
     search_fields = (
         "name",
         "server__name",
+    )
+
+# ==========================================================
+# Metric Admin
+# ==========================================================
+#
+# Configures how collected monitoring metrics appear in
+# Django Admin.
+#
+# This allows administrators and developers to inspect
+# collected infrastructure metrics without writing SQL.
+#
+# ==========================================================
+
+
+@admin.register(Metric)
+class MetricAdmin(admin.ModelAdmin):
+    """
+    Admin configuration for Metric records.
+    """
+
+    # Columns displayed in the admin list page.
+    list_display = (
+        "server",
+        "cpu_usage",
+        "memory_usage",
+        "disk_usage",
+        "response_time",
+        "status",
+        "collected_at",
+    )
+
+    # Filters shown in the right sidebar.
+    list_filter = (
+        "status",
+        "server",
+    )
+
+    # Search fields.
+    search_fields = (
+        "server__name",
+    )
+
+    # Default ordering.
+    ordering = (
+        "-collected_at",
     )
