@@ -19,9 +19,17 @@ Author:
 Enterprise Infrastructure & Automation Platform (EIAP)
 """
 
+import time
+
+from django.utils import timezone
 import psutil
-from apps.monitoring.models import Metric
-from apps.monitoring.models import Server
+
+from apps.monitoring.models import (
+    HealthCheck,
+    HealthCheckStatus,
+    Metric,
+    Server,
+)
 
 
 class MetricCollector:
@@ -87,30 +95,83 @@ class MetricCollector:
     @staticmethod
     def collect_and_save_metrics(server: Server) -> Metric:
         """
-        Collect metrics from the local machine and save them
-        to the database.
+        Collect metrics from the local machine and save both
+        Metric and HealthCheck records.
 
-        Parameters
-        ----------
-        server : Server
-            The monitored server/resource these metrics belong to.
-
-        Returns
-        -------
-        Metric
-            The newly created Metric database record.
+        This method represents one complete monitoring execution.
         """
 
-        # First, collect the latest system metrics.
-        metrics = MetricCollector.collect_local_metrics()
+        # --------------------------------------------------
+        # Record when monitoring started.
+        # --------------------------------------------------
+        started_at = timezone.now()
 
-        # Create and save a new Metric record.
-        metric = Metric.objects.create(
-            server=server,
-            cpu_usage=metrics["cpu_usage"],
-            memory_usage=metrics["memory_usage"],
-            disk_usage=metrics["disk_usage"],
-            status="Healthy",
-        )
+        # Start a high-precision timer.
+        start_time = time.perf_counter()
 
-        return metric
+        try:
+
+            # ----------------------------------------------
+            # Collect system metrics.
+            # ----------------------------------------------
+            metrics = MetricCollector.collect_local_metrics()
+
+            # ----------------------------------------------
+            # Save the collected metrics.
+            # ----------------------------------------------
+            metric = Metric.objects.create(
+                server=server,
+                cpu_usage=metrics["cpu_usage"],
+                memory_usage=metrics["memory_usage"],
+                disk_usage=metrics["disk_usage"],
+                status="Healthy",
+            )
+
+            # Stop timer.
+            end_time = time.perf_counter()
+
+            finished_at = timezone.now()
+
+            # Convert seconds → milliseconds.
+            execution_time_ms = int(
+                (end_time - start_time) * 1000
+            )
+
+            # ----------------------------------------------
+            # Save successful execution.
+            # ----------------------------------------------
+            HealthCheck.objects.create(
+                server=server,
+                status=HealthCheckStatus.SUCCESS,
+                started_at=started_at,
+                finished_at=finished_at,
+                execution_time_ms=execution_time_ms,
+            )
+
+            return metric
+
+        except Exception as exc:
+
+            end_time = time.perf_counter()
+
+            finished_at = timezone.now()
+
+            execution_time_ms = int(
+                (end_time - start_time) * 1000
+            )
+
+            # ----------------------------------------------
+            # Record failed execution.
+            # ----------------------------------------------
+            HealthCheck.objects.create(
+                server=server,
+                status=HealthCheckStatus.FAILED,
+                started_at=started_at,
+                finished_at=finished_at,
+                execution_time_ms=execution_time_ms,
+                error_type=type(exc).__name__,
+                error_message=str(exc),
+            )
+
+            # Re-raise the exception so Django can report it.
+            raise

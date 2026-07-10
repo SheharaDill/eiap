@@ -13,12 +13,15 @@ the Django Admin interface.
 """
 
 # Import Django's admin module.
-# This provides tools to customize the Django Admin Panel.
-from .models import Metric
 from django.contrib import admin
 
-# Import the models we want to manage in the Admin Panel.
-from .models import MonitoringJob, Server
+# Import all monitoring models used by Django Admin.
+from .models import (
+    Server,
+    MonitoringJob,
+    Metric,
+    HealthCheck,
+)
 
 
 # =====================================================================
@@ -204,4 +207,70 @@ class MetricAdmin(admin.ModelAdmin):
     # Default ordering.
     ordering = (
         "-collected_at",
+    )
+
+# ==========================================================
+# Health Check Admin
+# ==========================================================
+#
+# Displays the execution history of every monitoring job.
+#
+# Unlike Metric records, HealthCheck records describe
+# how the monitoring process itself performed.
+#
+# Example:
+#
+# Local Django API
+# SUCCESS
+# 125 ms
+# 2026-07-09 10:30
+#
+# ==========================================================
+
+
+@admin.register(HealthCheck)
+class HealthCheckAdmin(admin.ModelAdmin):
+    """
+    Admin configuration for HealthCheck records.
+    """
+
+    # ------------------------------------------------------
+    # Columns displayed in Django Admin.
+    #
+    # This lets administrators quickly see:
+    #
+    # • Which server was checked
+    # • Which monitoring job executed
+    # • Whether it succeeded
+    # • How long it took
+    # • When it started
+    # ------------------------------------------------------
+    list_display = (
+        "server",
+        "monitoring_job",
+        "status",
+        "execution_time_ms",
+        "started_at",
+    )
+
+    # ------------------------------------------------------
+    # Filters shown in the right sidebar.
+    # ------------------------------------------------------
+    list_filter = (
+        "status",
+    )
+
+    # ------------------------------------------------------
+    # Search by server name or monitoring job name.
+    # ------------------------------------------------------
+    search_fields = (
+        "server__name",
+        "monitoring_job__name",
+    )
+
+    # ------------------------------------------------------
+    # Show newest executions first.
+    # ------------------------------------------------------
+    ordering = (
+        "-started_at",
     )
