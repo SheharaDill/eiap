@@ -30,6 +30,12 @@ from apps.monitoring.models import (
     Metric,
     Server,
 )
+# Import the automation rule engine.
+#
+# After every successful metric collection,
+# the Rule Engine evaluates whether any
+# automation rules should be triggered.
+# from apps.automation.services.rule_engine import RuleEngine
 
 
 class MetricCollector:
@@ -126,6 +132,20 @@ class MetricCollector:
                 disk_usage=metrics["disk_usage"],
                 status="Healthy",
             )
+            # --------------------------------------------------
+            # Evaluate automation rules using the newly
+            # collected metrics.
+            # The Rule Engine will determine whether any
+            # automation rule matches this Metric.## Example:
+            # CPU > 90%
+            # If the condition is true, the Rule Engine
+            # will report the matching rule.
+            # (The Action Executor will be connected later.)
+            # --------------------------------------------------
+
+            from apps.automation.services.rule_engine import RuleEngine
+            # Evaluate automation rules for the newly collected metric.
+            RuleEngine.evaluate(metric)
 
             # Stop timer.
             end_time = time.perf_counter()
