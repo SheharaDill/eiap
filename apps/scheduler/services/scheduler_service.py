@@ -52,6 +52,17 @@ from apps.monitoring.models import MonitoringJob
 # other infrastructure metrics.
 from apps.monitoring.services.metric_collector import MetricCollector
 
+# Import the API Monitoring service.
+#
+# This service checks every registered API endpoint
+# and records its health.
+from apps.monitoring.services.api_monitor import APIMonitor
+# Import the Website Monitoring service.
+#
+# This service periodically checks the availability
+# and response time of websites registered in EIAP.
+from apps.monitoring.services.website_monitor import WebsiteMonitor
+
 
 class SchedulerService:
     """
@@ -100,6 +111,59 @@ class SchedulerService:
                 # Unique APScheduler job identifier.
                 id=f"monitoring_job_{job.id}",
                 # Replace existing jobs instead of creating duplicates.
+                replace_existing=True,
+            )
+            # ------------------------------------------------------
+            # Schedule API Monitoring.
+            # This runs at the same interval as the monitoring job.
+            # Every execution:
+            # 1. Loads all registered APIs.
+            # 2. Performs HTTP health checks.
+            # 3. Measures response time.
+            # ------------------------------------------------------
+
+            self.scheduler.add_job(
+                APIMonitor.monitor_all,
+                trigger="interval",
+                seconds=job.interval_seconds,
+                id=f"api-monitor-{job.id}",
+                replace_existing=True,
+            )
+            # ------------------------------------------------------
+            # Schedule Website Monitoring.
+            # This job periodically checks every website
+            # registered in the system.
+            # Workflow
+# Scheduler
+#      │
+#      ▼
+# WebsiteMonitor.monitor_all()
+#      │
+#      ▼
+# HTTP Check
+#      │
+#      ▼
+# Update Status
+#      │
+#      ▼
+# Create HealthCheck
+            # ------------------------------------------------------
+
+            self.scheduler.add_job(
+
+                # Execute website monitoring.
+                WebsiteMonitor.monitor_all,
+
+                # Execute repeatedly.
+                trigger="interval",
+
+                # Same interval as the monitoring job.
+                seconds=job.interval_seconds,
+
+                # Unique APScheduler job identifier.
+                id=f"website-monitor-{job.id}",
+
+                # Prevent duplicate jobs.
                 replace_existing=True,
             )
 

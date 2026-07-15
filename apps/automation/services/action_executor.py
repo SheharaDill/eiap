@@ -41,6 +41,15 @@ from apps.alerts.models import (
 # metric that triggered it.
 from apps.monitoring.models import Metric
 
+# Import the browser workflow runner.
+#
+# When an automation rule requests browser
+# automation, the Action Executor delegates
+# execution to the Workflow Runner.
+from apps.browser.services.workflow_runner import (
+    WorkflowRunner,
+)
+
 
 class ActionExecutor:
     """
@@ -75,61 +84,34 @@ class ActionExecutor:
         print("===================================")
 
         # ------------------------------------------
+        # ------------------------------------------
         # Create Alert
         # ------------------------------------------
+        #
+        # Delegate alert creation to the AlertManager.
+        #
+        # AlertManager is responsible for:
+        #
+        # • Alert creation
+        # • Alert deduplication
+        # • Alert acknowledgement
+        # • Alert resolution
+        #
+        # ActionExecutor simply decides which action
+        # should be executed.
+        #
         if rule.action == AutomationAction.CREATE_ALERT:
 
-            # Check whether an OPEN alert already exists
-            # for this server and rule.
-            existing_alert = Alert.objects.filter(
-                server=rule.server,
+            # Import here to avoid circular imports.
+            from apps.alerts.services.alert_manager import AlertManager
+
+            # Delegate the work to AlertManager.
+            AlertManager.create_alert(
                 rule=rule,
-                status=AlertStatus.OPEN,
-            ).first()
-
-            # If an alert already exists, don't create another.
-            if existing_alert:
-
-                print(
-                    f"Open alert already exists "
-                    f"(ID: {existing_alert.id})"
-                )
-
-                return
-
-            # Create a new Alert record in the database.
-            alert = Alert.objects.create(
-
-                # Server where the incident occurred.
-                server=metric.server,
-
-                # Rule that triggered the alert.
-                rule=rule,
-
-                # Metric responsible for triggering the rule.
                 metric=metric,
-
-                # Short alert title.
-                name=rule.name,
-
-                # Human-readable description.
-                message=(
-                    f"Automation rule '{rule.name}' "
-                    f"was triggered."
-                ),
-
-                # Default severity.
-                severity=AlertSeverity.WARNING,
-                status=AlertStatus.OPEN,
-            )
-
-            print(
-                f"Alert created successfully "
-                f"(ID: {alert.id})"
             )
 
             return
-
         # ------------------------------------------
         # Send Email
         # ------------------------------------------
@@ -162,8 +144,18 @@ class ActionExecutor:
         # ------------------------------------------
         if rule.action == AutomationAction.BROWSER_AUTOMATION:
 
-            print("Launching Browser Automation...")
+            print(
+                "Starting browser automation workflow..."
+            )
+
+            # Execute the registered browser workflow.
+            #
+            # For now we always run the demonstration
+            # workflow.
+            # Later this workflow name will be stored
+            # in the database.
+            WorkflowRunner.run(
+                "demo",
+            )
 
             return
-
-        print("Unknown automation action.")

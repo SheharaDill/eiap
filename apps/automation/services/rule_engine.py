@@ -38,7 +38,17 @@ from apps.monitoring.models import Metric
 # Once a rule matches, the Rule Engine delegates
 # execution to this service.
 from apps.automation.services.action_executor import ActionExecutor
-from apps.alerts.services.alert_service import AlertService
+# Import the Alert Manager.
+#
+# This service manages the complete lifecycle
+# of alerts including:
+#
+# • Creating alerts
+# • Resolving alerts
+# • Finding open alerts
+# • Acknowledging alerts
+#
+from apps.alerts.services.alert_manager import AlertManager
 
 
 class RuleEngine:
@@ -99,7 +109,29 @@ class RuleEngine:
                 print(
                     f"[NO MATCH] {rule.name}"
                 )
-                AlertService.resolve_alert(rule)
+                # ------------------------------------------
+                # The rule no longer matches.
+                #
+                # If an OPEN alert exists for this rule,
+                # automatically resolve it.
+                # ------------------------------------------
+
+                open_alert = AlertManager.find_open_alert(
+                    server=metric.server,
+                    rule=rule,
+                )
+
+                # Resolve the alert only if one exists.
+                if open_alert:
+
+                    AlertManager.resolve_alert(
+                        alert=open_alert,
+                        notes=(
+                            "Resolved automatically because "
+                            "the monitored metric returned "
+                            "to a healthy value."
+                        ),
+                    )
 
     @staticmethod
     def rule_matches(metric: Metric, rule: AutomationRule):

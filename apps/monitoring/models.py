@@ -42,6 +42,17 @@ class Server(models.Model):
 
     port = models.PositiveIntegerField(default=80)
 
+    # API endpoint or website path.
+    #
+    # Examples:
+    # /
+    # /health/
+    # /api/v1/status/
+    endpoint = models.CharField(
+        max_length=255,
+        default="/",
+    )
+
     resource_type = models.CharField(
         max_length=20,
         choices=ResourceType.choices,
