@@ -29,7 +29,10 @@ class BrowserManager:
     """
 
     @staticmethod
-    def create_browser(headless=True):
+    def create_browser(
+        headless=True,
+        slow_mo=0,
+    ):
         """
         Start Playwright and launch Chromium.
 
@@ -55,7 +58,13 @@ class BrowserManager:
 
         # Launch Chromium.
         browser = playwright.chromium.launch(
+            # Show or hide the browser.
             headless=headless,
+
+            # Slow down Playwright actions.
+            slow_mo=slow_mo,
+
+
         )
 
         # Create an isolated browser context.

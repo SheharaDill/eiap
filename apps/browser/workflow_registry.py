@@ -20,8 +20,11 @@ No other code changes are needed.
 
 # Import available workflows.
 from apps.browser.workflows.demo_workflow import DemoWorkflow
-
-
+from apps.browser.workflows.demo_workflow import DemoWorkflow
+from apps.browser.workflows.login_workflow import LoginWorkflow
+from apps.browser.workflows.employee_search_workflow import (
+    EmployeeSearchWorkflow,
+)
 # ==========================================================
 # Workflow Registry
 # ==========================================================
@@ -30,5 +33,7 @@ WORKFLOWS = {
 
     # Demonstration workflow.
     "demo": DemoWorkflow,
+    "login": LoginWorkflow,
+    "employee_search": EmployeeSearchWorkflow,
 
 }

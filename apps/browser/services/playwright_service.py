@@ -66,6 +66,7 @@ class PlaywrightService:
         playwright, browser, context, page = (
             BrowserManager.create_browser(
                 headless=headless,
+                slow_mo=800,
             )
         )
 
