@@ -42,10 +42,22 @@ class DashboardPage(BasePage):
         # Later we will replace it with the actual
         # application's dashboard selector.
         #
+        try:
 
-        return self.page.locator(
-            "h6"
-        ).is_visible()
+            self.page.wait_for_url(
+                "**/dashboard/index",
+                timeout=10000,
+            )
+
+            return True
+
+        except Exception:
+
+            return False
+
+    #    return self.page.locator(
+    #        "h6"
+    #    ).is_visible()
 
     # ==================================================
     # Navigation

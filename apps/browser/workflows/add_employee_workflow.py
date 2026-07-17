@@ -7,13 +7,14 @@ a new employee.
 
 from apps.browser.services.playwright_service import PlaywrightService
 
-from apps.browser.pages.login_page import LoginPage
-from apps.browser.pages.dashboard_page import DashboardPage
+from apps.browser.services.authentication_service import (
+    AuthenticationService,
+)
+
 from apps.browser.pages.pim_page import PIMPage
 from apps.browser.pages.add_employee_page import AddEmployeePage
 
 from apps.browser.config.applications import ApplicationConfig
-from apps.browser.config.credentials import DemoCredentials
 
 
 class AddEmployeeWorkflow:
@@ -44,23 +45,9 @@ class AddEmployeeWorkflow:
             # Login
             # ------------------------
 
-            login = LoginPage(page)
-
-            dashboard = DashboardPage(page)
-
-            login.login(
-                DemoCredentials.USERNAME,
-                DemoCredentials.PASSWORD,
+            dashboard = AuthenticationService.login(
+                page,
             )
-
-            dashboard.wait(3000)
-
-            if not dashboard.is_loaded():
-
-                raise Exception(
-                    "Login failed."
-                )
-
             print("Dashboard loaded.")
 
             # ------------------------
@@ -90,6 +77,10 @@ class AddEmployeeWorkflow:
             employee.enter_last_name("Smith")
 
             employee.save()
+
+            print("Current URL:", page.url)
+
+            page.pause()
 
             if not employee.is_employee_created():
 

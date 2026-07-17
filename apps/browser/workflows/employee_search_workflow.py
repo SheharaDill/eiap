@@ -14,6 +14,9 @@ from apps.browser.pages.employee_list_page import EmployeeListPage
 
 from apps.browser.config.applications import ApplicationConfig
 from apps.browser.config.credentials import DemoCredentials
+from apps.browser.services.authentication_service import (
+    AuthenticationService,
+)
 
 
 class EmployeeSearchWorkflow:
@@ -43,22 +46,9 @@ class EmployeeSearchWorkflow:
             # ------------------------------
             # Login
             # ------------------------------
-            login = LoginPage(page)
-
-            dashboard = DashboardPage(page)
-
-            login.login(
-                DemoCredentials.USERNAME,
-                DemoCredentials.PASSWORD,
+            dashboard = AuthenticationService.login(
+                page,
             )
-
-            dashboard.wait(3000)
-
-            if not dashboard.is_loaded():
-
-                raise Exception(
-                    "Login failed."
-                )
 
             print("Dashboard loaded.")
 

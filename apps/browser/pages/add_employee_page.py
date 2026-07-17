@@ -122,10 +122,15 @@ class AddEmployeePage(BasePage):
         Save employee.
         """
 
-        print("Saving Employee")
+        self.page.locator(
+            "button[type='submit']"
+        ).last.click()
 
-        self.click(
-            'button[type="submit"]'
+        print("Waiting for Personal Details page...")
+
+        self.page.wait_for_url(
+            "**/viewPersonalDetails/**",
+            timeout=30000,
         )
 
     def is_employee_created(self):
@@ -136,24 +141,6 @@ class AddEmployeePage(BasePage):
         -------
         bool
         """
-
-        print("Verifying employee creation...")
-
-        try:
-
-            self.page.get_by_role(
-                "heading",
-                name="Personal Details",
-            ).wait_for(
-                timeout=10000,
-            )
-
-            print("Employee created successfully.")
-
-            return True
-
-        except Exception:
-
-            print("Employee creation verification failed.")
-
-            return False
+        return self.page.url.startswith(
+            "https://opensource-demo.orangehrmlive.com/web/index.php/pim/viewPersonalDetails/"
+        )
