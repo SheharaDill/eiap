@@ -25,6 +25,9 @@ from apps.browser.workflows.login_workflow import LoginWorkflow
 from apps.browser.workflows.employee_search_workflow import (
     EmployeeSearchWorkflow,
 )
+from apps.browser.workflows.add_employee_workflow import (
+    AddEmployeeWorkflow,
+)
 # ==========================================================
 # Workflow Registry
 # ==========================================================
@@ -35,5 +38,6 @@ WORKFLOWS = {
     "demo": DemoWorkflow,
     "login": LoginWorkflow,
     "employee_search": EmployeeSearchWorkflow,
+    "add_employee": AddEmployeeWorkflow,
 
 }
