@@ -14,6 +14,7 @@ Benefits
 • Consistent browser interactions
 • Enterprise Page Object Model (POM)
 """
+from pathlib import Path
 
 
 class BasePage:
@@ -139,24 +140,29 @@ class BasePage:
 
     def screenshot(
         self,
-        path: str,
+        filename: str,
     ):
         """
         Capture a screenshot.
-
-        Parameters
-        ----------
-        path
-
-            Screenshot file path.
         """
+        screenshot_dir = Path(
+            "apps/browser/screenshots"
+        )
+
+        screenshot_dir.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        path = screenshot_dir / filename
 
         print(
             f"Saving screenshot -> {path}"
         )
 
         self.page.screenshot(
-            path=path,
+            path=str(path),
+            full_page=True,
         )
 
     # ==================================================

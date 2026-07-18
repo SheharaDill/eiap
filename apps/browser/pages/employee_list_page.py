@@ -41,6 +41,31 @@ class EmployeeListPage(BasePage):
 
         )
 
+    def open_employee(
+        self,
+        employee_name: str,
+    ):
+        """
+        Open an employee from the search results.
+        """
+
+        print(
+            f"Opening employee: {employee_name}"
+        )
+
+        #
+        # Wait until search results appear.
+        #
+        self.wait(2000)
+
+        #
+        # Click the employee name.
+        #
+        self.page.get_by_text(
+            employee_name,
+            exact=True,
+        ).first.click()
+
     def clear_search(self):
         """
         Reset the search form.

@@ -22,6 +22,6 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
 
         WorkflowRunner.run(
-            "add_employee",
-            # "employee_search",
+            #    "add_employee",
+            "employee_search",
         )

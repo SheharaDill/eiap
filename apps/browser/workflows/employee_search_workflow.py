@@ -67,8 +67,9 @@ class EmployeeSearchWorkflow:
             employee = EmployeeListPage(page)
 
             employee.search_employee(
-                "Linda"
+                "John"
             )
+            employee.open_employee("John")
 
             dashboard.wait(3000)
 
