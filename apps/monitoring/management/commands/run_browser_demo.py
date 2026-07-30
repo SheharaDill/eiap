@@ -23,5 +23,6 @@ class Command(BaseCommand):
 
         WorkflowRunner.run(
             #    "add_employee",
-            "employee_search",
+            # "employee_search",
+            "delete_employee",
         )
