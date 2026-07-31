@@ -25,4 +25,5 @@ class Command(BaseCommand):
             #    "add_employee",
             # "employee_search",
             "delete_employee",
+            # "edit_employee",
         )

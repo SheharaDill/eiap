@@ -28,6 +28,9 @@ from apps.browser.workflows.employee_search_workflow import (
 from apps.browser.workflows.add_employee_workflow import (
     AddEmployeeWorkflow,
 )
+from apps.browser.workflows.edit_employee_workflow import (
+    EditEmployeeWorkflow,
+)
 from apps.browser.workflows.delete_employee_workflow import DeleteEmployeeWorkflow
 # ==========================================================
 # Workflow Registry
@@ -41,5 +44,6 @@ WORKFLOWS = {
     "employee_search": EmployeeSearchWorkflow,
     "add_employee": AddEmployeeWorkflow,
     "delete_employee": DeleteEmployeeWorkflow,
+    "edit_employee": EditEmployeeWorkflow,
 
 }

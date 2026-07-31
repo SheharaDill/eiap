@@ -56,14 +56,14 @@ class EditEmployeeWorkflow:
             employees = EmployeeListPage(page)
 
             employees.search_employee(
-                "John"
+                "John SD"
             )
 
             #
             # Open employee
             #
             employees.open_employee(
-                "John"
+                "John SD"
             )
 
             #
