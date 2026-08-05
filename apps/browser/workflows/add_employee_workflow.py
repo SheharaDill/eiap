@@ -23,7 +23,11 @@ class AddEmployeeWorkflow:
     """
 
     @staticmethod
-    def run():
+    def run(
+        first_name: str = "John",
+        middle_name: str = "A",
+        last_name: str = "Smith",
+    ):
 
         print("\n===================================")
         print("ADD EMPLOYEE WORKFLOW")
@@ -35,8 +39,11 @@ class AddEmployeeWorkflow:
             context,
             page,
         ) = PlaywrightService.open_website(
+
             ApplicationConfig.ORANGE_HRM_URL,
+
             headless=False,
+
         )
 
         try:
@@ -46,9 +53,14 @@ class AddEmployeeWorkflow:
             # ------------------------
 
             dashboard = AuthenticationService.login(
+
                 page,
+
             )
-            print("Dashboard loaded.")
+
+            print(
+                "Dashboard loaded."
+            )
 
             # ------------------------
             # Open PIM
@@ -70,35 +82,75 @@ class AddEmployeeWorkflow:
 
             dashboard.wait(2000)
 
-            employee.enter_first_name("John")
+            #
+            # Enter employee details.
+            #
+            print(
+                f"First Name : {first_name}"
+            )
 
-            employee.enter_middle_name("A")
+            employee.enter_first_name(
 
-            employee.enter_last_name("Smith")
+                first_name,
 
+            )
+
+            employee.enter_middle_name(
+
+                middle_name,
+
+            )
+
+            employee.enter_last_name(
+
+                last_name,
+
+            )
+            #
+            # Generate a unique employee ID.
+            #
+            employee.enter_employee_id()
+
+            #
+            # Save employee.
+            #
             employee.save()
 
-            print("Current URL:", page.url)
+            #
+            # Debugging information.
+            #
+            print(
+                "Current URL:",
+                page.url,
+            )
 
             page.pause()
 
+            #
+            # Verify employee creation.
+            #
             if not employee.is_employee_created():
 
                 raise Exception(
                     "Employee creation failed."
                 )
 
+            #
+            # Capture screenshot.
+            #
             employee.screenshot(
-                "employee_created.png"
+
+                "employee_created.png",
+
             )
 
             print(
                 "Workflow completed successfully."
             )
 
-        except Exception as e:
+        except Exception as error:
 
-            print(e)
+            print(error)
 
             raise
 
@@ -109,6 +161,9 @@ class AddEmployeeWorkflow:
             )
 
             PlaywrightService.close(
+
                 playwright,
+
                 browser,
+
             )

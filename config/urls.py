@@ -40,5 +40,15 @@ urlpatterns = [
             "apps.monitoring.api.urls",
         ),
     ),
+    #
+    # Browser Automation APIs.
+    #
+    path(
+        "api/",
+        include(
+            "apps.browser.api.urls",
+        ),
+    ),
+
 
 ]

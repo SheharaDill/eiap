@@ -19,7 +19,10 @@ class WorkflowRunner:
     """
 
     @staticmethod
-    def run(workflow_name: str):
+    def run(
+        workflow_name: str,
+        **kwargs,
+    ):
         """
         Execute a browser workflow.
 
@@ -29,19 +32,31 @@ class WorkflowRunner:
 
             Name of the workflow.
 
-        Example
+        **kwargs
 
-        "demo"
+            Optional parameters forwarded
+            to the workflow.
         """
 
         workflow = WORKFLOWS.get(
+
             workflow_name,
+
         )
 
         if workflow is None:
 
             raise ValueError(
+
                 f"Unknown workflow: {workflow_name}"
+
             )
 
-        workflow.run()
+        #
+        # Execute workflow.
+        #
+        workflow.run(
+
+            **kwargs,
+
+        )

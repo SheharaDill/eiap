@@ -5,6 +5,7 @@ Represents the Add Employee screen.
 """
 
 from apps.browser.pages.base_page import BasePage
+import random
 
 
 class AddEmployeePage(BasePage):
@@ -63,6 +64,39 @@ class AddEmployeePage(BasePage):
         self.fill(
             'input[name="lastName"]',
             last_name,
+        )
+
+    def enter_employee_id(self):
+        """
+        Generate and enter a unique employee ID.
+        """
+
+        #
+        # Generate a random employee ID.
+        #
+        employee_id = str(
+            random.randint(
+                100000,
+                999999,
+            )
+        )
+
+        print(
+            f"Employee ID : {employee_id}"
+        )
+
+        #
+        # Employee ID textbox.
+        #
+        employee_id_box = self.page.locator(
+            "input.oxd-input"
+        ).nth(4)
+
+        #
+        # Replace the existing value.
+        #
+        employee_id_box.fill(
+            employee_id,
         )
 
     def enable_login_details(self):
