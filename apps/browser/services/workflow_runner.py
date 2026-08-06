@@ -11,6 +11,12 @@ Workflow Registry.
 """
 
 from apps.browser.workflow_registry import WORKFLOWS
+#
+# Workflow execution tracking.
+#
+from apps.browser.services.workflow_execution_service import (
+    WorkflowExecutionService,
+)
 
 
 class WorkflowRunner:
@@ -37,7 +43,9 @@ class WorkflowRunner:
             Optional parameters forwarded
             to the workflow.
         """
-
+        #
+        # Find the requested workflow.
+    #
         workflow = WORKFLOWS.get(
 
             workflow_name,
@@ -53,10 +61,48 @@ class WorkflowRunner:
             )
 
         #
-        # Execute workflow.
+        # Create execution record.
         #
-        workflow.run(
+        execution = WorkflowExecutionService.start(
 
-            **kwargs,
+            workflow_name=workflow_name,
+
+            parameters=kwargs,
 
         )
+        try:
+
+            #
+            # Execute workflow.
+            #
+            workflow.run(
+
+                **kwargs,
+
+            )
+            #
+            # Mark workflow as successful.
+            #
+            WorkflowExecutionService.complete(
+
+                execution,
+
+            )
+        except Exception as error:
+
+           #
+            # Mark workflow as failed.
+            #
+            WorkflowExecutionService.fail(
+
+                execution,
+
+                error,
+
+            )
+
+            #
+            # Re-raise the exception so the API
+            # can return an error response.
+            #
+            raise
