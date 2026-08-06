@@ -86,7 +86,7 @@ class AddEmployeeWorkflow:
             # Enter employee details.
             #
             print(
-                f"First Name : {first_name}"
+                f"First Name : {first_name} {middle_name} {last_name}"
             )
 
             employee.enter_first_name(
@@ -115,16 +115,6 @@ class AddEmployeeWorkflow:
             # Save employee.
             #
             employee.save()
-
-            #
-            # Debugging information.
-            #
-            print(
-                "Current URL:",
-                page.url,
-            )
-
-            page.pause()
 
             #
             # Verify employee creation.
